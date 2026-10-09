@@ -336,7 +336,7 @@ export default function AddExpenseModal({
           {existingReceipt && !receipt && (
             <div className="expense-receipt-preview">
               <img
-                src={`/api/transactions/${initialTransaction._id}/receipt`}
+                src={`${import.meta.env.VITE_API_URL || ""}/api/transactions/${initialTransaction._id}/receipt`}
                 alt="Existing expense receipt"
               />
 

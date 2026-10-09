@@ -11,6 +11,12 @@ import {
 import Home from "./pages/Home";
 import Expenses from "./pages/Expenses";
 
+const API_BASE_URL = import.meta.env.VITE_API_URL || "";
+
+async function apiFetch(path, options) {
+  return fetch(`${API_BASE_URL}${path}`, options);
+}
+
 export default function App() {
   const [transactions, setTransactions] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -26,9 +32,9 @@ export default function App() {
       categoryResponse,
       walletResponse,
     ] = await Promise.all([
-      fetch("/api/transactions?limit=100"),
-      fetch("/api/categories"),
-      fetch("/api/wallets"),
+      apiFetch("/api/transactions?limit=100"),
+      apiFetch("/api/categories"),
+      apiFetch("/api/wallets"),
     ]);
 
     if (
@@ -124,7 +130,7 @@ export default function App() {
     if (name === null || !name.trim()) return;
 
     try {
-      const response = await fetch("/api/categories", {
+      const response = await apiFetch("/api/categories", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -172,7 +178,7 @@ export default function App() {
     }
 
     try {
-      const response = await fetch("/api/wallets", {
+      const response = await apiFetch("/api/wallets", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -210,7 +216,7 @@ export default function App() {
     setBusyCategoryId(category._id);
 
     try {
-      const response = await fetch(
+      const response = await apiFetch(
         `/api/categories/${category._id}`,
         { method: "DELETE" }
       );
@@ -247,7 +253,7 @@ export default function App() {
       throw new Error("Could not identify the expense to update.");
     }
 
-    const response = await fetch(
+    const response = await apiFetch(
       isEdit
         ? `/api/transactions/${transactionId}`
         : "/api/transactions",
@@ -280,7 +286,7 @@ export default function App() {
       const formData = new FormData();
       formData.append("file", receipt);
 
-      const receiptResponse = await fetch(
+      const receiptResponse = await apiFetch(
         `/api/transactions/${savedTransaction._id}/receipt`,
         {
           method: "PUT",
@@ -291,7 +297,6 @@ export default function App() {
       const receiptResult = await receiptResponse.json();
 
       if (!receiptResponse.ok || !receiptResult.success) {
-        // The transaction itself was already saved.
         try {
           await refreshData();
         } catch {
@@ -334,7 +339,7 @@ export default function App() {
     setBusyTransactionId(transaction._id);
 
     try {
-      const response = await fetch(
+      const response = await apiFetch(
         `/api/transactions/${transaction._id}`,
         { method: "DELETE" }
       );
